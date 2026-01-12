@@ -13,7 +13,21 @@ datasource db {
   provider = "postgresql"
 }
 
-model Test {
-  id    Int    @id @default(autoincrement())
-  name  String
+model User {
+  id Int @id @default(autoincrement())
+  cretedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email String @unique
+  hash String
+  fullName String
+}
+
+model BookMark {
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title String
+  url String
+  description String?
+  links String
 }
