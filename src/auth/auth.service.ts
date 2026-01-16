@@ -26,13 +26,17 @@ export class AuthService {
 
     const user = await this.prisma.user.create({
       data: {
+        name: data.name,
         email: data.email,
         hash,
-        fullName: '',
       },
     });
 
-    const token = this.jwtService.sign({ sub: user.id, email: user.email });
+    const token = this.jwtService.sign({
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+    });
 
     return { message: 'User registered successfully', token };
   }
@@ -44,10 +48,11 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const valid = await bcrypt.compare(data.password, user.hash);
-    if (!valid) throw new UnauthorizedException('Wrong password');
+    if (!valid) throw new UnauthorizedException('Password not correct');
 
     return {
       access_token: this.jwtService.sign({ sub: user.id, email: user.email }),
+      name: user.name || '',
     };
   }
 }

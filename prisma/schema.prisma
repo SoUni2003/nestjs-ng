@@ -13,16 +13,16 @@ datasource db {
 }
 
 model User {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
   cretedAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   email String @unique
   hash String
-  fullName String
+  name String?
 }
 
 model BookMark {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   title String
