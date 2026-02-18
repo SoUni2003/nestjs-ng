@@ -8,6 +8,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   app.useGlobalPipes(
     new ValidationPipe({
+      whitelist: true,
       exceptionFactory: (errors) => {
         const messages = errors.map((err) => {
           const constraints = err.constraints
@@ -27,4 +28,4 @@ async function bootstrap() {
   await app.listen(port);
 }
 
-bootstrap();
+void bootstrap();

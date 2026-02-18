@@ -1,10 +1,6 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
-class RegisterDto {
-  @IsString()
-  @IsNotEmpty({ message: 'Name is required' })
-  name: string;
-
+class AdminLoginDto {
   @IsEmail({}, { message: 'Invalid email format' })
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
@@ -14,7 +10,7 @@ class RegisterDto {
   password: string;
 }
 
-class UserLoginDto {
+class AdminRegisterDto {
   @IsEmail({}, { message: 'Invalid email format' })
   @IsNotEmpty({ message: 'Email is required' })
   email: string;
@@ -22,6 +18,10 @@ class UserLoginDto {
   @IsString()
   @IsNotEmpty({ message: 'Password is required' })
   password: string;
+
+  @IsString()
+  @IsOptional()
+  name?: string;
 }
 
-export { RegisterDto, UserLoginDto };
+export { AdminLoginDto, AdminRegisterDto };
