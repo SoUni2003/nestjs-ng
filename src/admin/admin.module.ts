@@ -3,6 +3,7 @@ import { AdminAuthService } from './admin.service';
 import { AdminAuthController } from './admin.controller';
 import { PrismaModule } from '../prisma/prisma.module';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtAdminStrategy } from '../auth/strategy/jwt-admin.strategy';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { JwtModule } from '@nestjs/jwt';
     }),
   ],
   controllers: [AdminAuthController],
-  providers: [AdminAuthService],
+  providers: [AdminAuthService, JwtAdminStrategy],
 })
 export class AdminAuthModule {}

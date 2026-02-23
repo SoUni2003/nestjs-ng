@@ -19,7 +19,7 @@ export class AdminAuthService {
   async register(data: AdminRegisterDto) {
     try {
       const hashed = await bcrypt.hash(data.password, 10);
-      const admin = await this.prisma.user.create({
+      const admin = await this.prisma.admin.create({
         data: { email: data.email, password: hashed, name: data.name },
       });
       return admin;
@@ -34,7 +34,7 @@ export class AdminAuthService {
   }
 
   async login(data: AdminLoginDto) {
-    const admin = await this.prisma.user.findUnique({
+    const admin = await this.prisma.admin.findUnique({
       where: { email: data.email },
     });
     if (!admin || !(await bcrypt.compare(data.password, admin.password))) {
