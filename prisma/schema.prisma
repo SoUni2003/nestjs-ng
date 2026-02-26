@@ -29,12 +29,28 @@ model Admin {
   name String?
 }
 
-model BookMark {
-  id String @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title String
-  url String
-  description String?
-  links String
+model Topic {
+  id      String  @id @default(uuid())
+  name    String
+  words   Word[]
+}
+
+model Word {
+  id        String    @id @default(uuid())
+  word      String
+  ipa       String?
+  meaning   String?
+  audioUrl  String?
+  topicId   String?
+  topic     Topic?    @relation(fields: [topicId], references: [id])
+  examples  Example[]
+}
+
+model Example {
+  id        String   @id @default(uuid())
+  textEn    String
+  textVi    String?
+  wordId    String
+  word      Word     @relation(fields: [wordId], references: [id])
+  audioUrl  String?
 }

@@ -8,6 +8,9 @@ import { PostModule } from './post/post.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { BlogModule } from './blog/blog.module';
 import { AdminAuthModule } from './admin';
+import { WordModule } from './word/word.module';
+import { TopicModule } from './topic/topic.module';
+import { ExampleModule } from './example/example.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { AdminAuthModule } from './admin';
     PostModule,
     PrismaModule,
     BlogModule,
+    WordModule,
+    TopicModule,
+    ExampleModule,
   ],
   controllers: [AppController],
   providers: [AppService],
