@@ -12,45 +12,80 @@ datasource db {
 }
 
 model User {
-  id String @id @default(uuid())
-  cretedAt DateTime @default(now())
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  email String @unique
-  password String
-  name String?
+  email     String   @unique
+  password  String
+  name      String?
 }
 
 model Admin {
-  id String @id @default(uuid())
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  email String @unique
-  password String
-  name String?
+  email     String   @unique
+  password  String
+  name      String?
 }
 
-model Topic {
-  id      String  @id @default(uuid())
-  name    String
-  words   Word[]
+enum ProductType {
+  product
+  technology
 }
 
-model Word {
-  id        String    @id @default(uuid())
-  word      String
-  ipa       String?
-  meaning   String?
-  audioUrl  String?
-  topicId   String?
-  topic     Topic?    @relation(fields: [topicId], references: [id])
-  examples  Example[]
+model Product {
+  id                   String                 @id @default(uuid())
+  type                 ProductType
+  name                 String
+  image                String?
+  description          String
+  strengths            Json? // thế mạnh
+  specifications       ProductSpecification[] @relation("ProductSpecifications") // Thông số kỹ thuật
+  applicationScenarios ApplicationScenario[]  @relation("ProductApplicationScenarios") // Kịch bản ứng dụng
+  features             ProductFeature[]       @relation("ProductFeatures") // Đặc tính sản phẩm
+  slug                 String                 @unique
+  relatedProducts      Product[]              @relation("RelatedProducts")
+  parentProductId      String?
+  parentProduct        Product?               @relation("RelatedProducts", fields: [parentProductId], references: [id])
 }
 
-model Example {
+model ProductSpecification {
+  id           String  @id @default(uuid())
+  productId    String
+  name         String
+  image        String?
+  descriptions Json? // [{ title?: string, description: string }]
+  product      Product @relation("ProductSpecifications", fields: [productId], references: [id])
+}
+
+model ApplicationScenario {
+  id           String  @id @default(uuid())
+  productId    String
+  name         String
+  image        String?
+  descriptions Json? // [{ title?: string, description: string }]
+  product      Product @relation("ProductApplicationScenarios", fields: [productId], references: [id])
+}
+
+model ProductFeature {
+  id           String  @id @default(uuid())
+  productId    String
+  name         String
+  image        String?
+  descriptions Json? // [{ title?: string, description: string }]
+  product      Product @relation("ProductFeatures", fields: [productId], references: [id])
+}
+
+model Contact {
   id        String   @id @default(uuid())
-  textEn    String
-  textVi    String?
-  wordId    String
-  word      Word     @relation(fields: [wordId], references: [id])
-  audioUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name      String
+  email     String
+  phone     String
+  jobTitle  String
+  company   String
+  country   String
+  message   String?
 }

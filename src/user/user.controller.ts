@@ -7,8 +7,8 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 @UseGuards(JwtUserGuard)
 @Controller('users')
 export class UserController {
-  @Get('me')
-  getMe(@GetUser() user: User) {
-    return user;
-  }
+  // @Get('me')
+  // getMe(@GetUser() user: User) {
+  //   return user;
+  // }
 }
