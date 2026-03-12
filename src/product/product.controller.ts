@@ -38,9 +38,10 @@ export class ProductController {
     return this.productService.findOne(slug);
   }
 
+  @ApplyApiQueryFromDto(SearchProductDto)
   @Get('/products/:slug/related')
-  findRelated(@Param('slug') slug: string) {
-    return this.productService.findRelated(slug);
+  findRelated(@Param('slug') slug: string, @Query() query: SearchProductDto) {
+    return this.productService.findRelated(slug, query);
   }
 
   @UseGuards(JwtAdminGuard)

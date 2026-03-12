@@ -136,7 +136,8 @@ export class ProductService {
     };
   }
 
-  async findRelated(slug: string) {
+  async findRelated(slug: string, query: SearchProductDto) {
+    const { currentPage, perPage } = query;
     const product = await this.prisma.product.findUnique({
       where: { slug },
       include: {
@@ -153,15 +154,37 @@ export class ProductService {
       },
     });
 
-    if (!product) return [];
+    if (!product)
+      return {
+        data: [],
+        total_items: 0,
+      };
 
-    const allRelated = [...product.relatedProducts, ...product.relatedBy];
+    const allRelated = [
+      ...product.relatedProducts,
+      ...product.relatedBy,
+    ] as Prisma.ProductGetPayload<{ include: { category: true } }>[];
 
-    const uniqueRelated = Array.from(
+    let uniqueRelated = Array.from(
       new Map(allRelated.map((item) => [item.id, item])).values(),
     ).filter((p) => p.id !== product.id);
 
-    return uniqueRelated.map((p) => ({
+    if (query.searchKey) {
+      const lowerKey = query.searchKey.toLowerCase();
+      uniqueRelated = uniqueRelated.filter(
+        (p) =>
+          p.name.toLowerCase().includes(lowerKey) ||
+          p.description.toLowerCase().includes(lowerKey),
+      );
+    }
+
+    const total = uniqueRelated.length;
+    const page = currentPage ?? 1;
+    const limit = perPage ?? 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+
+    const data = uniqueRelated.slice(startIndex, endIndex).map((p) => ({
       slug: p.slug,
       name: p.name,
       image: p.image,
@@ -169,6 +192,11 @@ export class ProductService {
       type: p.type,
       description: p.description,
     }));
+
+    return {
+      data,
+      total_items: total,
+    };
   }
 
   async findOne(id: string) {
