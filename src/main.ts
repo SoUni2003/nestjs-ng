@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe, BadRequestException } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -51,6 +52,7 @@ async function bootstrap() {
       },
     }),
   );
+  app.useGlobalFilters(new PrismaClientExceptionFilter());
   const port: number = Number(configService.get('PORT')) || 3001;
 
   const config = new DocumentBuilder()
