@@ -15,13 +15,13 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAdminGuard } from '../auth/guard';
 
 @ApiTags('Categories')
-@Controller('category')
+@Controller('admin/category')
+@UseGuards(JwtAdminGuard)
+@ApiBearerAuth()
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post()
-  @UseGuards(JwtAdminGuard)
-  @ApiBearerAuth()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
@@ -37,8 +37,6 @@ export class CategoryController {
   }
 
   @Put(':id')
-  @UseGuards(JwtAdminGuard)
-  @ApiBearerAuth()
   update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
@@ -47,8 +45,6 @@ export class CategoryController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAdminGuard)
-  @ApiBearerAuth()
   remove(@Param('id') id: string) {
     return this.categoryService.remove(id);
   }
