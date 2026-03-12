@@ -41,7 +41,7 @@ export class ProductService {
     if (!data.name) throw new Error('Product name is required');
 
     const {
-      parentProductId,
+      relatedProductIds,
       strengths,
       specifications,
       features,
@@ -54,10 +54,11 @@ export class ProductService {
       slug,
       name: data.name,
       strengths: strengths ? JSON.stringify(strengths) : undefined,
-      parentProductId:
-        parentProductId && parentProductId.trim() !== ''
-          ? parentProductId
-          : undefined,
+      relatedProducts: relatedProductIds
+        ? {
+            connect: relatedProductIds.map((id) => ({ id })),
+          }
+        : undefined,
       specifications: wrapCreate(
         specifications?.map((item) => ({
           ...item,
@@ -88,17 +89,20 @@ export class ProductService {
   }
 
   async findAll(query: SearchProductDto) {
-    const { currentPage, perPage, searchKey } = query;
+    const { currentPage, perPage, searchKey, category } = query;
     const skip = ((currentPage ?? 1) - 1) * (perPage ?? 10);
-    let where: Partial<Prisma.ProductWhereInput> = {};
+    const where: Prisma.ProductWhereInput = {};
 
     if (searchKey) {
-      where = {
-        ...where,
-        OR: [
-          { name: { contains: searchKey, mode: 'insensitive' } },
-          { description: { contains: searchKey, mode: 'insensitive' } },
-        ],
+      where.OR = [
+        { name: { contains: searchKey, mode: 'insensitive' } },
+        { description: { contains: searchKey, mode: 'insensitive' } },
+      ];
+    }
+
+    if (category) {
+      where.category = {
+        OR: [{ slug: category }, { id: category }],
       };
     }
 
@@ -112,8 +116,8 @@ export class ProductService {
           specifications: true,
           applicationScenarios: true,
           features: true,
-          parentProduct: true,
           relatedProducts: true,
+          category: true,
         },
       }),
     ]);
@@ -124,11 +128,47 @@ export class ProductService {
       title: product.name,
       image: product.image,
       description: product.description,
+      category: product.category,
     }));
     return {
       data,
       total_items: total,
     };
+  }
+
+  async findRelated(slug: string) {
+    const product = await this.prisma.product.findUnique({
+      where: { slug },
+      include: {
+        relatedProducts: {
+          include: {
+            category: true,
+          },
+        },
+        relatedBy: {
+          include: {
+            category: true,
+          },
+        },
+      },
+    });
+
+    if (!product) return [];
+
+    const allRelated = [...product.relatedProducts, ...product.relatedBy];
+
+    const uniqueRelated = Array.from(
+      new Map(allRelated.map((item) => [item.id, item])).values(),
+    ).filter((p) => p.id !== product.id);
+
+    return uniqueRelated.map((p) => ({
+      slug: p.slug,
+      name: p.name,
+      image: p.image,
+      category: p.category,
+      type: p.type,
+      description: p.description,
+    }));
   }
 
   async findOne(id: string) {
@@ -138,8 +178,9 @@ export class ProductService {
         specifications: true,
         applicationScenarios: true,
         features: true,
-        parentProduct: true,
-        relatedProducts: true,
+        relatedProducts: { include: { category: true } },
+        relatedBy: { include: { category: true } },
+        category: true,
       },
     });
     if (!product) {
@@ -149,8 +190,9 @@ export class ProductService {
           specifications: true,
           applicationScenarios: true,
           features: true,
-          parentProduct: true,
-          relatedProducts: true,
+          relatedProducts: { include: { category: true } },
+          relatedBy: { include: { category: true } },
+          category: true,
         },
       });
     }
@@ -174,6 +216,7 @@ export class ProductService {
     return {
       slug: product.slug,
       name: product.name,
+      type: product.type,
       title: product.name,
       image: mainImage,
       description: product.description,
@@ -184,14 +227,14 @@ export class ProductService {
       specifications: parseDescriptions(product.specifications),
       features: parseDescriptions(product.features),
       applicationScenarios: parseDescriptions(product.applicationScenarios),
-      parentProduct: product.parentProduct,
-      relatedProducts: product.relatedProducts,
+      relatedProducts: [...product.relatedProducts, ...product.relatedBy],
+      category: product.category,
     };
   }
 
   async update(id: string, data: UpdateProductDto) {
     const {
-      parentProductId,
+      relatedProductIds,
       strengths,
       specifications,
       features,
@@ -202,10 +245,11 @@ export class ProductService {
     const updateData: Prisma.ProductUncheckedUpdateInput = {
       ...rest,
       strengths: strengths ? JSON.stringify(strengths) : undefined,
-      parentProductId:
-        parentProductId && parentProductId.trim() !== ''
-          ? parentProductId
-          : undefined,
+      relatedProducts: relatedProductIds
+        ? {
+            set: relatedProductIds.map((id) => ({ id })),
+          }
+        : undefined,
       specifications: wrapCreate(
         specifications?.map((item) => ({
           ...item,

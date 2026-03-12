@@ -38,6 +38,11 @@ export class ProductController {
     return this.productService.findOne(slug);
   }
 
+  @Get('/products/:slug/related')
+  findRelated(@Param('slug') slug: string) {
+    return this.productService.findRelated(slug);
+  }
+
   @UseGuards(JwtAdminGuard)
   @ApiBearerAuth()
   @Put('/admin/product/:id')
