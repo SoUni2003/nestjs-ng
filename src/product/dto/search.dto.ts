@@ -7,6 +7,11 @@ class ProductFilterDto {
   @IsOptional()
   @IsString()
   searchKey?: string;
+
+  @ApiPropertyOptional({ description: 'Category slug or id' })
+  @IsOptional()
+  @IsString()
+  category?: string;
 }
 
 export class SearchProductDto extends IntersectionType(
