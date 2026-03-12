@@ -43,10 +43,11 @@ const parseDescriptions = <T extends { descriptions?: unknown }>(
   });
 };
 
-const ApplyApiQueryFromDto = (dto: any) => {
+const ApplyApiQueryFromDto = (dto: new (...args: any[]) => any) => {
   const metadataStorage = getMetadataStorage();
   const validations = metadataStorage.getTargetValidationMetadatas(
-    dto,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    dto as unknown as Function,
     '',
     false,
     false,
@@ -57,7 +58,9 @@ const ApplyApiQueryFromDto = (dto: any) => {
   );
 
   const decorators = properties.map((prop) => {
-    const type = Reflect.getMetadata('design:type', dto.prototype, prop) as Function | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument
+    const type = Reflect.getMetadata('design:type', dto.prototype, prop);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     return ApiQuery({ name: prop, required: false, type });
   });
 

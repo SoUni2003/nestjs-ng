@@ -46,8 +46,9 @@ model Product {
   features             ProductFeature[]       @relation("ProductFeatures") // Đặc tính sản phẩm
   slug                 String                 @unique
   relatedProducts      Product[]              @relation("RelatedProducts")
-  parentProductId      String?
-  parentProduct        Product?               @relation("RelatedProducts", fields: [parentProductId], references: [id])
+  relatedBy            Product[]              @relation("RelatedProducts")
+  categoryId           String
+  category             Category               @relation(fields: [categoryId], references: [id])
 }
 
 model ProductSpecification {
@@ -88,4 +89,15 @@ model Contact {
   company   String
   country   String
   message   String?
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  slug        String   @unique
+  description String?
+  logo_url    String?
+  products    Product[]
 }

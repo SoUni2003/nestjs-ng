@@ -9,6 +9,7 @@ import { BlogModule } from './blog/blog.module';
 import { AdminAuthModule } from './admin';
 import { ContactModule } from './contact/contact.module';
 import { ProductModule } from './product/product.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProductModule } from './product/product.module';
     BlogModule,
     ContactModule,
     ProductModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
